@@ -22,7 +22,7 @@ import au.com.cba.omnia.thermometer.hive.HiveSupport
 
 object HiveJobSpec extends ThermometerSpec with HiveSupport { def is = sequential ^ s2"""
   HiveJob
-  ========
+  =======
 
   Can run hive query without any input or output taps $empty
 
