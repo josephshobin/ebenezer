@@ -39,6 +39,7 @@ Hive support for (thrift scrooge encoded) partitioned parquet tables
     "column1"
   )
   val testRecords = List(rec)
+  val changedRecords = List(rec.copy(entityId = "my_new_table"))
 
   def write = {
     lazy val parquetTestRecordCodec = CompactScalaCodec(ParquetTestRecord)
@@ -72,7 +73,7 @@ Hive support for (thrift scrooge encoded) partitioned parquet tables
       partitionColumns
     ))
 
-    val sink = PartitionHiveParquetScroogeSink[(String, Long), ParquetTestRecord](
+    val sink = PartitionHiveParquetScroogeSink[(String, Long), SomeOtherRecord](
       database = database,
       table = "some_other_fake_records_table",
       partitionColumns = List("p_entity" -> "string", "p_partition" -> "bigint")
@@ -80,17 +81,17 @@ Hive support for (thrift scrooge encoded) partitioned parquet tables
 
     typedPipe
       .map { rec ⇒
-        ("table", 0L) -> rec
+        ("table", 1L) -> SomeOtherRecord("some_string") //rec.copy(entityId = "my_new_table")
       }
       .write(sink)
       .withFacts(
         List(hiveWarehouse </> "database.db" </> "some_other_fake_records_table" ==> exists) ++ List(
         hiveWarehouse </> "database.db" </> "some_other_fake_records_table"
           </> s"p_entity=table"
-          </> "p_partition=0"
+          </> "p_partition=1"
           </> "*.parquet" ==> records(
-            ParquetThermometerRecordReader[ParquetTestRecord],
-            testRecords
+            ParquetThermometerRecordReader[SomeOtherRecord],
+            List(SomeOtherRecord("some_string"))
           )
       ): _*
       )
