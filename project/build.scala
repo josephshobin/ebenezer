@@ -25,12 +25,13 @@ import au.com.cba.omnia.uniform.assembly.UniformAssemblyPlugin._
 import au.com.cba.omnia.humbug.HumbugSBT._
 
 object build extends Build {
-  val thermometerVersion = "0.5.3-20150211063703-3f20266-CDH5"
-  val omnitoolVersion    = "1.6.0-20150211060329-d0909d8-CDH5"
+  val thermometerVersion = "0.5.3-20150304012351-4b9564f"
+  val omnitoolVersion    = "1.6.0-20150303125532-d9848dd"
 
   lazy val standardSettings =
     Defaults.coreDefaultSettings ++
     uniformDependencySettings ++
+    strictDependencySettings ++
     uniform.docSettings("https://github.com/CommBank/ebenezer") ++ Seq(
       logLevel in sbtassembly.Plugin.AssemblyKeys.assembly := Level.Error
     )
@@ -50,7 +51,7 @@ object build extends Build {
   lazy val core = Project(
     id = "core",
     base = file("core"),
-    settings = 
+    settings =
       standardSettings
         ++ uniform.project("ebenezer", "au.com.cba.omnia.ebenezer")
         ++ uniformThriftSettings
@@ -59,7 +60,7 @@ object build extends Build {
           libraryDependencies ++=
             depend.hadoop() ++ depend.scalding() ++ depend.scalaz() ++
             depend.parquet() ++ Seq(
-              "au.com.cba.omnia" %% "humbug-core" % "0.4.0-20150212002030-09a79ac-CDH5",
+              "au.com.cba.omnia" %% "humbug-core" % "0.4.0-20150304003044-0b89dff",
               "au.com.cba.omnia" %% "thermometer" % thermometerVersion % "test"
             ),
           scroogeThriftSourceFolder in Test <<= (sourceDirectory) { _ / "test" / "thrift" / "scrooge" },
@@ -90,8 +91,8 @@ object build extends Build {
         ++ Seq(
           libraryDependencies ++=
             depend.hadoop() ++ depend.parquet() ++
-            depend.omnia("omnitool-core", omnitoolVersion) ++ 
-            depend.omnia("cascading-hive", "1.6.2-20150212002010-ae5bcb0-CDH5") ++
+            depend.omnia("omnitool-core", omnitoolVersion) ++
+            depend.omnia("cascading-hive", "1.6.2-20150303123116-0fb1bcb") ++
             Seq(
               "au.com.cba.omnia" %% "thermometer-hive"  % thermometerVersion % "test",
               "au.com.cba.omnia" %% "omnitool-core"     % omnitoolVersion    % "test" classifier "tests"
